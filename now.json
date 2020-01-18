@@ -1,0 +1,6 @@
+{
+  "version": 2,
+  "env": {
+    "FAUNADB_SECRET": "@faunadb_secret"
+  }
+}

@@ -1,0 +1,8 @@
+/node_modules/
+/public/build/
+/public/bundle.css
+/public/bundle.js
+/public/dist
+.DS_Store
+
+.now
