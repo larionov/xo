@@ -10,7 +10,7 @@
 
   export let id;
 
-  let boardSize = 3;
+  let boardSize = null;
   let isLoading = true;
 
   let wins;
@@ -26,6 +26,7 @@
   }
 
   function generateWinConditions(size) {
+      if (!size) return;
       const wins = [];
       for (let i = 0; i < size; i++) {
           const row = [];
@@ -137,7 +138,7 @@
 </style>
 
 <div class="relative overflow-hidden mb-8 m-auto w-auto text-5xl  text-center">
-  {#if $gameState.boardSize}
+  {#if boardSize}
   <div class="grid grid-rows-{$gameState.boardSize} grid-flow-col gap-4 bg-white rounded-t-lg overflow-hidden border border-gray-400 p-4 p-0">
     {#each Array(boardSize) as _, x}
     <div class="min-w-0">

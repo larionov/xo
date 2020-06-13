@@ -5,7 +5,6 @@
 
   import TitleScreen from "./components/titleScreen.svelte";
   import GameScreen from "./components/gameScreen.svelte";
-  import GameOverScreen from "./components/gameOverScreen.svelte";
 
   export let url = "";
 </script>
@@ -18,7 +17,6 @@
       <Route path="game/:id" let:params>
         <GameScreen id="{params.id}" />
       </Route>
-      <Route path="/gameOver" component="{GameOverScreen}" />
     </div>
   </Router>
 </main>
