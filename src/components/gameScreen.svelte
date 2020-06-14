@@ -69,6 +69,7 @@
   ref.on('value', function(snapshot) {
       let game = snapshot.val();
       game.moves = objectToArray(game.moves);
+      game.boardSize = game.boardSize || 3;
 
       isLoading = false;
 
