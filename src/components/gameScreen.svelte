@@ -1,7 +1,5 @@
 <script>
   import { gameState } from "../store/store.js";
-  import { Router, Link } from "svelte-routing";
-	import { onMount } from 'svelte';
   import firebase from "firebase/app";
   const database = firebase.database();
 
@@ -10,11 +8,7 @@
 
   export let id;
 
-  let boardSize = null;
   let isLoading = true;
-
-  let wins;
-  $: wins = generateWinConditions(boardSize);
 
   function arrayToObject(arr) {
       return JSON.stringify(arr);
@@ -55,15 +49,8 @@
       return wins;
   }
 
-  function now() {
-      return Date.now();
-  }
-
-  let game, field = [];
-
-  function checkWinner() {
-      if (!wins) return false;
-      const moves = $gameState.moves;
+  function checkWinner({ boardSize, moves }) {
+      if (!wins) return [];
       for (let i = 0; i < wins.length; i++) {
           let win = wins[i];
           let xs = 0; let os = 0;
@@ -77,7 +64,6 @@
       return [];
   }
 
-  let winner = checkWinner();
   const ref = firebase.database().ref('game/' + id);
 
   ref.on('value', function(snapshot) {
@@ -87,13 +73,10 @@
       isLoading = false;
 
       gameState.update(state => Object.assign(state, game));
-      boardSize = $gameState.boardSize || 3;
-      field = movesToField($gameState.moves)
-      winner = checkWinner();
   });
 
 
-  const movesToField = (moves) => {
+  const movesToField = ({ boardSize, moves }) => {
       const res = Array(boardSize * boardSize).fill('', 0, boardSize * boardSize);
 
       moves.forEach((move, index) => {
@@ -108,8 +91,8 @@
 
       await ref.set({
           moves: "[]",
-          lastmove: now(),
-          boardSize,
+          lastmove: Date.now(),
+          boardSize: $gameState.boardSize,
       });
   };
 
@@ -117,25 +100,28 @@
       isLoading = true
       ref.set({
           moves: arrayToObject([...$gameState.moves, move]),
-          lastmove: now(),
-          boardSize,
+          lastmove: Date.now(),
+          boardSize: $gameState.boardSize,
       });
   };
 
-  const cell = (x, y) => {
+  const cell = ({ boardSize }, x, y) => {
       return x * boardSize + y;
   };
-</script>
 
-<style type="text/postcss">
-  svg {
-    fill: currentColor;
-    -o-object-fit: contain;
-    object-fit: contain;
-    width: 100%!important;
-    height: 100%!important;
-  }
-</style>
+  $: wins = generateWinConditions({
+      boardSize: $gameState.boardSize
+  });
+  $: field = movesToField({
+      boardSize: $gameState.boardSize,
+      moves: $gameState.moves,
+  });
+  $: winner = checkWinner({
+      boardSize: $gameState.boardSize,
+      moves: $gameState.moves,
+  });
+  $: boardSize = $gameState.boardSize;
+</script>
 
 <div class="relative overflow-hidden mb-8 m-auto w-auto text-5xl  text-center">
   {#if boardSize}
@@ -144,13 +130,13 @@
     <div class="min-w-0">
       {#each Array(boardSize) as _, y}
       <button
-        on:click={onClickMove(cell(x,y))}
+        on:click={onClickMove(cell($gameState, x, y))}
         class="h-16 w-16 m-1 rounded-lg border {field[cell(x,y)] ? 'cursor-not-allowed' : ''} border-gray-400 align-middle"
         disabled={!!field[cell(x,y)]}
         >
-        {#if field[cell(x,y)] === 'x'}
+        {#if field[cell($gameState, x,y)] === 'x'}
         <X classList="{winner.includes(cell(x,y)) ? 'text-green-500' : 'text-blue-600'}"/>
-        {:else if field[cell(x,y)] === 'o'}
+        {:else if field[cell($gameState, x,y)] === 'o'}
         <O classList="{winner.includes(cell(x,y)) ? 'text-green-500' : 'text-pink-600'}"/>
         {/if}
 

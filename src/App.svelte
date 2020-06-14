@@ -9,7 +9,7 @@
   export let url = "";
 </script>
 
-<main  class='flex-1 mx-auto p-8'>
+<main  class='flex-1 mx-auto'>
   <Router url="{url}">
     <h1 class="text-5xl"><Link to="/">XO</Link></h1>
     <div>

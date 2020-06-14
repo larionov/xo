@@ -23,7 +23,10 @@
 
       const id = generate('0123456789abcdefghijklmnopqrstuvwxyz', 6);
       const ref = firebase.database().ref('game/' + id);
-
+      gameState.set({
+          boardSize: 0,
+          moves: [],
+      });
       ref.set({
           id,
           boardSize,
